@@ -1,0 +1,39 @@
+name: My API - Documentation
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/redoc.yml'
+      - openapi.json
+      - 'images/**'
+
+jobs:
+  build:
+    name: Build My API documentation
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      id: git-checkhot
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Build index.html
+      id: redoc-build
+      shell: bash
+      continue-on-error: true
+      run: |
+        echo "Building index.html started" && \
+        npx redoc-cli build openapi.json --title "Rat API" && \
+        mv redoc-static.html index.html && \
+        sed -i '/<title>/a \ \ <link rel="icon" type="image/x-icon" href="images/favicon.ico">' index.html && \
+        echo "Building index.html finished"
+
+    - name: Deploy to GitHub Pages
+      # https://github.com/peaceiris/actions-gh-pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: .
+        force_orphan: true
+        exclude_assets: '.github,LICENSE,README.md'
