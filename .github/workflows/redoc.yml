@@ -5,7 +5,6 @@ on:
     paths:
       - '.github/workflows/redoc.yml'
       - openapi.json
-      - 'images/**'
 
 jobs:
   build:
